@@ -32,7 +32,7 @@ class Environment:
         # Lấy danh sách các tệp tin CSV trong thư mục hiện tại
         # csv_files = glob.glob('*.csv')
 
-        folder_path = 'data'  # Tên của thư mục chứa các file CSV (data)
+        folder_path = 'data/train'  # Tên của thư mục chứa các file CSV (data)
     
         # Lấy danh sách các tệp tin CSV trong thư mục đã chỉ định
         csv_files = glob.glob(os.path.join(folder_path, '*.csv'))
@@ -68,7 +68,7 @@ class Environment:
   # for testing purpose
   def get_csv(self):
 
-        csv_file = os.path.join('data', '1-13.csv')
+        csv_file = os.path.join('data/train', '1-13.csv')
         rpm = csv_file.split('-')[1].split('.')[0]
         rpm = int(rpm)
 
@@ -119,33 +119,36 @@ class Environment:
       done = False
       reward = 0
       # peak = 0
+      loss = 0
 
       if action == 0:
           pass
       elif action == 1:
           self.peak += 1
-          # reward = 0.005
+          reward = 0.005
       else:
           print('invalid action')
       self.state_step += 1
       if self.state_step == len(self.state_slide):
-        if abs(self.peak - self.rpm) == 0:
+        loss = abs(self.peak - self.rpm)
+        if loss == 0:
             reward = 20
 
-        elif abs(self.peak - self.rpm) == 1:
+        elif loss == 1:
             reward = 5
 
-        elif abs(self.peak - self.rpm) == 2:
+        elif loss == 2:
             reward = -5
 
-        elif abs(self.peak - self.rpm) == 3:
+        elif loss == 3:
             reward = -10
 
-        elif abs(self.peak - self.rpm) >= 4:
+        elif loss >= 4:
             reward = -20
         # reward = 1/(1+abs(self.peak-self.rpm))
         done = True
         self.reset()
+        loss = loss ** 2
 
 
-      return reward, done
+      return reward, done, loss
